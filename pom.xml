@@ -5,7 +5,7 @@
   <name>jenkins-push-automatization</name>
   <description></description>
   <url>https://github.com/julian-eggers/jenkins-push-automatization</url>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -37,6 +37,13 @@
   </licenses>
 
   <build>
+    <finalName>${project.artifactId}</finalName>
+    <resources>
+      <resource>
+        <directory>src/main/resources/</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <plugins>
       <!-- BUILD AND FILES -->
       <plugin>
@@ -89,16 +96,17 @@
             <volume>/var/log/apps</volume>
           </volumes>
           <env>
+            <!-- Do not change ENV-Key! JENKINS_URL is reserved! -->
+            <JENKINSURL></JENKINSURL>
             <GITLAB_URL></GITLAB_URL>
             <GITLAB_TOKEN></GITLAB_TOKEN>
             <GITLAB_CHECKOUTURLSCHEME>SSH</GITLAB_CHECKOUTURLSCHEME>
-            <JENKINS_URL></JENKINS_URL>
             <TASK_DELAY>60000</TASK_DELAY>
             <HTTP_PORT>8080</HTTP_PORT>
             <MAX_HEAP>200M</MAX_HEAP>
             <JAVA_OPTS>-Dfoo=bar</JAVA_OPTS>
           </env>
-          <cmd>["/bin/sh", "-c", "java -Dgitlab.url=${GITLAB_URL} -Dgitlab.token=${GITLAB_TOKEN} -Dgitlab.checkout.url.scheme=${GITLAB_CHECKOUTURLSCHEME} -Djenkins.url=${JENKINS_URL} -Dtask.delay=${TASK_DELAY} -Dserver.port=${HTTP_PORT} -Dfile.encoding=UTF-8 -Xmx${MAX_HEAP} ${JAVA_OPTS} -jar /${project.build.finalName}.${project.packaging}"]</cmd>
+          <cmd>["/bin/sh", "-c", "java -Djenkins.url=${JENKINSURL} -Dgitlab.url=${GITLAB_URL} -Dgitlab.token=${GITLAB_TOKEN} -Dgitlab.checkout.url.scheme=${GITLAB_CHECKOUTURLSCHEME} -Dtask.delay=${TASK_DELAY} -Dserver.port=${HTTP_PORT} -Dfile.encoding=UTF-8 -Xmx${MAX_HEAP} ${JAVA_OPTS} -jar /${project.build.finalName}.${project.packaging}"]</cmd>
           <resources>
             <resource>
               <targetPath>/</targetPath>
