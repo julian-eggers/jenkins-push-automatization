@@ -11,5 +11,11 @@ public interface WebHookService
 
     void insertWebHook(WebHook webHook);
 
+    void deleteWebHook(WebHook webHook);
+
+    void deleteWebHooksByJenkinsHost(String jenkins);
+
     List<WebHook> getWebHooksByProject(Project project);
+
+    List<String> getJenkinsHosts();
 }
