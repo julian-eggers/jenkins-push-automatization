@@ -11,10 +11,7 @@ import com.itelg.devops.jpa.domain.Project;
 import com.itelg.devops.jpa.domain.WebHook;
 import com.itelg.devops.jpa.repository.WebHookRepository;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Repository
-@Slf4j
 public class HttpWebHookRepository extends AbstractGitlabHttpRepository implements WebHookRepository
 {
     @Override
@@ -26,7 +23,25 @@ public class HttpWebHookRepository extends AbstractGitlabHttpRepository implemen
         }
         catch (Exception e)
         {
-            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deleteWebhook(WebHook webHook)
+    {
+        try
+        {
+            GitlabProjectHook hook = new GitlabProjectHook();
+            hook.setId(String.valueOf(webHook.getId()));
+            hook.setProjectId(Integer.valueOf(Long.valueOf(webHook.getProjectId()).intValue()));
+            String tailUrl = GitlabProject.URL + "/" + hook.getProjectId() + GitlabProjectHook.URL + "/" + hook.getId();
+            gitlabAPI.retrieve().method("DELETE").to(tailUrl, hook);
+            // gitlabAPI.deleteProjectHook(hook);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
         }
     }
 
@@ -51,7 +66,7 @@ public class HttpWebHookRepository extends AbstractGitlabHttpRepository implemen
         }
         catch (Exception e)
         {
-            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
 
         return webHooks;

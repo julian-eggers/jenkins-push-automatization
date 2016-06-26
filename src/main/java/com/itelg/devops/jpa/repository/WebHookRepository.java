@@ -9,5 +9,7 @@ public interface WebHookRepository
 {
     void insertWebHook(WebHook webHook);
 
+    void deleteWebhook(WebHook webHook);
+
     List<WebHook> getWebHooksByProject(Project project);
 }
