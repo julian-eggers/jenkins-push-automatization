@@ -19,7 +19,7 @@ public class HttpWebHookRepository extends AbstractGitlabHttpRepository implemen
     {
         try
         {
-            gitlabAPI.addProjectHook(Long.valueOf(webHook.getProjectId()), webHook.getUrl(), true, false, false, false);
+            gitlabAPI.addProjectHook(Long.valueOf(webHook.getProjectId()), webHook.getUrl(), true, false, false, false, false);
         }
         catch (Exception e)
         {

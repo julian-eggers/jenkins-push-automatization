@@ -52,7 +52,7 @@ public class DefaultWebHookService implements WebHookService
         }
     }
 
-    String generateWebhookUrl(Project project)
+    private String generateWebhookUrl(Project project)
     {
         String webhookUrl = jenkinsUrl + "git/notifyCommit?url=";
 
