@@ -17,6 +17,6 @@ node
   
   stage('Deploy')
   {
-    sh 'mvn deploy -Dmaven.test.skip=true'
+    sh 'mvn docker:build -DpushImageTag'
   }
 }
