@@ -5,7 +5,7 @@ node
     checkout scm
   }
   
-  stage('Build')
+  stage('Compile')
   {
     sh 'mvn clean compile'
   }
