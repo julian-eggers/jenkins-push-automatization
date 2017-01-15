@@ -17,7 +17,7 @@ docker run \
 -e JENKINSURL=http://jenkins-server:8080/ \
 -e GITLAB_TOKEN=AfQ6P9DSfnu4tuzbe \
 -e GITLAB_URL=http://gitlab-server:8080/ \
-jeggers/jenkins-push-automatization:1.0.0-RELEASE
+jeggers/jenkins-push-automatization:1.0.1-RELEASE
 ```
 
 ### Properties
@@ -29,3 +29,5 @@ jeggers/jenkins-push-automatization:1.0.0-RELEASE
 | GITLAB_CHECKOUTURLSCHEME  | no  | SSH  | SSH or HTTP |
 | TASK_DELAY  | no  | 60000  | 60000 (in milliseconds!)  |
 | HTTP_PORT | no | 8080 | 8080 |
+| MAX_HEAP | no | 100M | 100M |
+| JAVA_OPTS | no |  | |
