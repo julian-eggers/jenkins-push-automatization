@@ -5,7 +5,7 @@
   <name>jenkins-push-automatization</name>
   <description></description>
   <url>https://github.com/julian-eggers/jenkins-push-automatization</url>
-  <version>1.0.1-RELEASE</version>
+  <version>1.0.2-RELEASE</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>1.4.3.RELEASE</version>
+    <version>1.4.4.RELEASE</version>
   </parent>
 
   <dependencies>
@@ -50,13 +50,13 @@
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-module-junit4</artifactId>
-      <version>1.6.6</version>
+      <version>1.7.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-api-easymock</artifactId>
-      <version>1.6.6</version>
+      <version>1.7.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -139,7 +139,7 @@
       <plugin>
         <groupId>com.spotify</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>0.4.13</version>
+        <version>1.0.0</version>
         <configuration>
           <serverId>dockerhub-jeggers</serverId>
           <imageName>jeggers/${project.artifactId}</imageName>
