@@ -5,7 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,14 +36,14 @@ public class DefaultWebHookService implements WebHookService
     @Value("${jenkins.url}")
     private String jenkinsUrl;
 
-    @NotBlank
+    @NotNull
     @Value("${gitlab.checkout.url.scheme}")
     private CheckoutUrlScheme checkoutUrlScheme;
 
     @Override
     public void addMissingWebHooks(Project project)
     {
-        String webhookUrl = generateWebhookUrl(project);
+        String webhookUrl = buildWebhookUrl(project);
 
         if (!getWebHooksByProject(project).stream().anyMatch(webhook -> webhook.getUrl().equals(webhookUrl)))
         {
@@ -52,7 +54,7 @@ public class DefaultWebHookService implements WebHookService
         }
     }
 
-    private String generateWebhookUrl(Project project)
+    private String buildWebhookUrl(Project project)
     {
         String webhookUrl = jenkinsUrl + "git/notifyCommit?url=";
 
@@ -71,15 +73,15 @@ public class DefaultWebHookService implements WebHookService
     @Override
     public void insertWebHook(WebHook webHook)
     {
+        log.info("Inserting {}", webHook);
         webHookRepository.insertWebHook(webHook);
-        log.info("WebHook inserted (" + webHook + ")");
     }
 
     @Override
     public void deleteWebHook(WebHook webHook)
     {
-        webHookRepository.deleteWebhook(webHook);
-        log.info("WebHook deleted (" + webHook + ")");
+        log.info("Deleting {}", webHook);
+        webHookRepository.deleteWebHook(webHook);
     }
 
     @Override

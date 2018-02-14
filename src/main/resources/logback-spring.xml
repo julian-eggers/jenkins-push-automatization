@@ -4,6 +4,7 @@
   <jmxConfigurator />
   <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
   <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+  <springProperty name="rootLevel" source="logging.level.root" />
 
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
@@ -12,7 +13,7 @@
     </encoder>
   </appender>
 
-  <root level="DEBUG">
+  <root level="${rootLevel}">
     <appender-ref ref="CONSOLE" />
   </root>
 

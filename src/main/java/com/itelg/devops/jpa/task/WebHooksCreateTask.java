@@ -3,7 +3,6 @@ package com.itelg.devops.jpa.task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -26,8 +25,7 @@ public class WebHooksCreateTask
 
     @Scheduled(fixedDelayString = "${task.delay}")
     @ManagedOperation
-    @Async
-    public void doJob()
+    public void run()
     {
         log.info("WebHooksCreateTask started");
 
