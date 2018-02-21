@@ -32,12 +32,17 @@ public interface DomainTestSupport
 
     default Project getCompleteProject()
     {
+        return getCompleteProject(1, "jenkins-push-automatization");
+    }
+
+    default Project getCompleteProject(long id, String name)
+    {
         Project project = new Project();
-        project.setId(1);
+        project.setId(id);
         project.setNamespace("devops");
-        project.setPath("devops/jenkins-push-automatization");
-        project.setCheckoutUrlSsh("git@gitlab-server:devops/jenkins-push-automatization.git");
-        project.setCheckoutUrlHttp("http://gitlab-server/devops/jenkins-push-automatization.git");
+        project.setPath("devops/" + name);
+        project.setCheckoutUrlSsh("git@gitlab-server:devops/" + name + ".git");
+        project.setCheckoutUrlHttp("http://gitlab-server/devops/" + name + ".git");
         return project;
     }
 

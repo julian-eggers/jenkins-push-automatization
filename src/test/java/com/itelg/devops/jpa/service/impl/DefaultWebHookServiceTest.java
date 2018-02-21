@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.getCurrentArguments;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
 
@@ -11,13 +13,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.easymock.EasyMock;
 import org.easymock.TestSubject;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.easymock.PowerMock;
 import org.powermock.api.easymock.annotation.MockStrict;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
@@ -145,108 +144,81 @@ public class DefaultWebHookServiceTest implements DomainTestSupport
     public void testDeleteWebHooksByJenkinsHost()
     {
         projectService.getAllProjects();
-        PowerMock.expectLastCall().andAnswer(() ->
+        expectLastCall().andAnswer(() ->
         {
             List<Project> projects = new ArrayList<>();
-
-            Project project1 = new Project();
-            project1.setId(1);
-            projects.add(project1);
-
-            Project project2 = new Project();
-            project2.setId(2);
-            projects.add(project2);
-
+            projects.add(getCompleteProject(1, "jenkins-push-automatization"));
+            projects.add(getCompleteProject(2, "docker-autodeploy"));
             return projects;
         });
 
-        webHookRepository.getWebHooksByProject(EasyMock.anyObject(Project.class));
-        PowerMock.expectLastCall().andAnswer(() ->
+        webHookRepository.getWebHooksByProject(anyObject(Project.class));
+        expectLastCall().andAnswer(() ->
         {
-            Project project = (Project) EasyMock.getCurrentArguments()[0];
-            Assert.assertEquals(1, project.getId());
+            assertThat(getCurrentArguments()[0]).isEqualToComparingFieldByFieldRecursively(getCompleteProject(1, "jenkins-push-automatization"));
 
-            List<WebHook> webHooks = new ArrayList<>();
-
-            WebHook webHook1 = new WebHook();
-            webHook1.setId(1);
+            WebHook webHook1 = getCompleteWebHookWithSslScheme();
             webHook1.setUrl("http://jenkins-server1/git/notifyCommit?url=git@gitlab-server:test/project.git");
-            webHooks.add(webHook1);
 
             WebHook webHook2 = new WebHook();
-            webHook2.setId(2);
             webHook2.setUrl("http://jenkins-server2/git/notifyCommit?url=git@gitlab-server:test/project.git");
-            webHooks.add(webHook2);
 
-            return webHooks;
+            return List.of(webHook1, webHook2);
         });
 
-        webHookRepository.deleteWebHook(EasyMock.anyObject(WebHook.class));
-        PowerMock.expectLastCall().andAnswer(() ->
+        webHookRepository.deleteWebHook(anyObject(WebHook.class));
+        expectLastCall().andAnswer(() ->
         {
-            WebHook webHook = (WebHook) EasyMock.getCurrentArguments()[0];
-            Assert.assertEquals(1, webHook.getId());
+            WebHook expected = getCompleteWebHookWithSslScheme();
+            expected.setUrl("http://jenkins-server1/git/notifyCommit?url=git@gitlab-server:test/project.git");
+            assertThat(getCurrentArguments()[0]).isEqualToComparingFieldByFieldRecursively(expected);
             return null;
         });
 
-        webHookRepository.getWebHooksByProject(EasyMock.anyObject(Project.class));
-        PowerMock.expectLastCall().andAnswer(() ->
+        webHookRepository.getWebHooksByProject(anyObject(Project.class));
+        expectLastCall().andAnswer(() ->
         {
-            Project project = (Project) EasyMock.getCurrentArguments()[0];
-            Assert.assertEquals(2, project.getId());
+            assertThat(getCurrentArguments()[0]).isEqualToComparingFieldByFieldRecursively(getCompleteProject(2, "docker-autodeploy"));
 
-            List<WebHook> webHooks = new ArrayList<>();
-
-            WebHook webHook1 = new WebHook();
-            webHook1.setId(3);
+            WebHook webHook1 = getCompleteWebHookWithSslScheme();
             webHook1.setUrl("http://jenkins-server1/git/notifyCommit?url=git@gitlab-server:test/project.git");
-            webHooks.add(webHook1);
 
-            WebHook webHook2 = new WebHook();
-            webHook2.setId(2);
+            WebHook webHook2 = getCompleteWebHookWithSslScheme();
             webHook2.setUrl("http://jenkins-server1/api/push?url=git@gitlab-server:test/project.git");
-            webHooks.add(webHook2);
 
-            return webHooks;
+            return List.of(webHook1, webHook2);
         });
 
-        webHookRepository.deleteWebHook(EasyMock.anyObject(WebHook.class));
-        PowerMock.expectLastCall().andAnswer(() ->
+        webHookRepository.deleteWebHook(anyObject(WebHook.class));
+        expectLastCall().andAnswer(() ->
         {
-            WebHook webHook = (WebHook) EasyMock.getCurrentArguments()[0];
-            Assert.assertEquals(3, webHook.getId());
+            WebHook expected = getCompleteWebHookWithSslScheme();
+            expected.setUrl("http://jenkins-server1/git/notifyCommit?url=git@gitlab-server:test/project.git");
+            assertThat(getCurrentArguments()[0]).isEqualToComparingFieldByFieldRecursively(expected);
             return null;
         });
 
-        PowerMock.replayAll();
+        replayAll();
         service.deleteWebHooksByJenkinsHost("jenkins-server1");
-        PowerMock.verifyAll();
+        verifyAll();
     }
 
     @Test
     public void testGetJenkinsHosts()
     {
         projectService.getAllProjects();
-        PowerMock.expectLastCall().andAnswer(() ->
+        expectLastCall().andAnswer(() ->
         {
             List<Project> projects = new ArrayList<>();
-
-            Project project1 = new Project();
-            project1.setId(1);
-            projects.add(project1);
-
-            Project project2 = new Project();
-            project2.setId(2);
-            projects.add(project2);
-
+            projects.add(getCompleteProject(1, "jenkins-push-automatization"));
+            projects.add(getCompleteProject(2, "docker-autodeploy"));
             return projects;
         });
 
-        webHookRepository.getWebHooksByProject(EasyMock.anyObject(Project.class));
-        PowerMock.expectLastCall().andAnswer(() ->
+        webHookRepository.getWebHooksByProject(anyObject(Project.class));
+        expectLastCall().andAnswer(() ->
         {
-            Project project = (Project) EasyMock.getCurrentArguments()[0];
-            Assert.assertEquals(1, project.getId());
+            assertThat(getCurrentArguments()[0]).isEqualToComparingFieldByFieldRecursively(getCompleteProject(1, "jenkins-push-automatization"));
 
             List<WebHook> webHooks = new ArrayList<>();
 
@@ -261,27 +233,26 @@ public class DefaultWebHookServiceTest implements DomainTestSupport
             return webHooks;
         });
 
-        webHookRepository.getWebHooksByProject(EasyMock.anyObject(Project.class));
-        PowerMock.expectLastCall().andAnswer(() ->
+        webHookRepository.getWebHooksByProject(anyObject(Project.class));
+        expectLastCall().andAnswer(() ->
         {
-            Project project = (Project) EasyMock.getCurrentArguments()[0];
-            Assert.assertEquals(2, project.getId());
+            assertThat(getCurrentArguments()[0]).isEqualToComparingFieldByFieldRecursively(getCompleteProject(2, "docker-autodeploy"));
 
-            List<WebHook> webHooks = new ArrayList<>();
-
-            WebHook webHook1 = new WebHook();
+            WebHook webHook1 = getCompleteWebHookWithSslScheme();
             webHook1.setUrl("http://jenkins-server1/git/notifyCommit?url=git@gitlab-server:test/project.git");
-            webHooks.add(webHook1);
 
-            return webHooks;
+            WebHook webHook2 = getCompleteWebHookWithSslScheme();
+            webHook2.setUrl("http://jenkins-server3/api/push?url=git@gitlab-server:test/project.git");
+
+            return List.of(webHook1, webHook2);
         });
 
-        PowerMock.replayAll();
+        replayAll();
         List<String> jenkinsUrls = service.getJenkinsHosts();
-        PowerMock.verifyAll();
+        verifyAll();
 
-        Assert.assertEquals(2, jenkinsUrls.size());
-        Assert.assertTrue(jenkinsUrls.contains("jenkins-server1"));
-        Assert.assertTrue(jenkinsUrls.contains("jenkins-server2"));
+        assertEquals(2, jenkinsUrls.size());
+        assertTrue(jenkinsUrls.contains("jenkins-server1"));
+        assertTrue(jenkinsUrls.contains("jenkins-server2"));
     }
 }
