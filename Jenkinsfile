@@ -18,6 +18,14 @@ pipeline
 
     stages
     {
+        stage('Info')
+        {
+            steps
+            {
+                sh 'mvn --version'
+            }
+        }
+        
         stage('Compile')
         {
             steps
