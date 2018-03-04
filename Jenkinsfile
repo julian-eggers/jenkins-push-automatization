@@ -22,7 +22,7 @@ pipeline
         {
             steps
             {
-                sh 'mvn-oraclejdk9 --version'
+                sh 'mvn-jdk9 --version'
             }
         }
         
@@ -30,7 +30,7 @@ pipeline
         {
             steps
             {
-                sh 'mvn-oraclejdk9 clean compile test-compile'
+                sh 'mvn-jdk9 clean compile test-compile'
             }
         }
   
@@ -38,7 +38,7 @@ pipeline
         {
             steps
             {
-                sh 'mvn-oraclejdk9 surefire:test'
+                sh 'mvn-jdk9 surefire:test'
             }
         }
   
@@ -46,7 +46,7 @@ pipeline
         {
             steps
             {
-                sh 'mvn-oraclejdk9 failsafe:integration-test'
+                sh 'mvn-jdk9 failsafe:integration-test failsafe:verify'
             }
         }
         
@@ -56,7 +56,7 @@ pipeline
         
             steps
             {
-                sh 'mvn-oraclejdk9 clean compile jar:jar spring-boot:repackage dockerfile:build dockerfile:tag@tag-latest dockerfile:tag@tag-version dockerfile:push@push-latest dockerfile:push@push-version github-release:release'
+                sh 'mvn-jdk9 clean compile jar:jar spring-boot:repackage dockerfile:build dockerfile:tag@tag-latest dockerfile:tag@tag-version dockerfile:push@push-latest dockerfile:push@push-version github-release:release'
             }
         }
     }
