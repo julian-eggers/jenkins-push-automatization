@@ -3,19 +3,31 @@
   <groupId>com.itelg.devops</groupId>
   <artifactId>jenkins-push-automatization</artifactId>
   <name>jenkins-push-automatization</name>
-  <description></description>
+  <description>Adds a jenkins webhook to every associated project.</description>
   <url>https://github.com/julian-eggers/jenkins-push-automatization</url>
-  <version>1.0.2-RELEASE</version>
+  <version>2.0.0-RELEASE</version>
 
   <properties>
+    <!-- System -->
+    <timestamp>${maven.build.timestamp}</timestamp>
+    <maven.build.timestamp.format>dd.MM.yyyy HH:mm</maven.build.timestamp.format>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>1.8</java.version>
+    <java.version>9</java.version>
+    <!-- Testing -->
+    <jacoco.version>0.8.0</jacoco.version>
+    <powermock.version>2.0.0-beta.5</powermock.version>
+    <easymock.version>3.5.1</easymock.version>
+    <!-- Build -->
+    <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+    <coveralls.version>4.3.0</coveralls.version>
+    <dockerfile-maven-plugin.version>1.3.7</dockerfile-maven-plugin.version>
+    <github-release-plugin.version>1.2.0</github-release-plugin.version>
   </properties>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>1.4.4.RELEASE</version>
+    <version>2.0.0.RELEASE</version>
   </parent>
 
   <dependencies>
@@ -35,41 +47,72 @@
       <artifactId>spring-boot-starter-undertow</artifactId>
     </dependency>
 
+    <!-- Logging & Monitoring -->
+    <dependency>
+      <groupId>org.jolokia</groupId>
+      <artifactId>jolokia-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
+
+    <!-- Other -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.gitlab</groupId>
+      <artifactId>java-gitlab-api</artifactId>
+      <version>1.2.8</version>
+    </dependency>
+
     <!-- Testing -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.skyscreamer</groupId>
+          <artifactId>jsonassert</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.jayway.jsonpath</groupId>
+          <artifactId>json-path</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>3.4</version>
+      <version>${easymock.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-module-junit4</artifactId>
-      <version>1.7.0</version>
+      <version>${powermock.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-api-easymock</artifactId>
-      <version>1.7.0</version>
+      <version>${powermock.version}</version>
       <scope>test</scope>
     </dependency>
-
-    <!-- Other -->
     <dependency>
-      <groupId>org.gitlab</groupId>
-      <artifactId>java-gitlab-api</artifactId>
-      <version>1.2.7</version>
-    </dependency>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <scope>provided</scope>
+      <groupId>org.jacoco</groupId>
+      <artifactId>org.jacoco.agent</artifactId>
+      <classifier>runtime</classifier>
+      <version>${jacoco.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -95,12 +138,6 @@
 
   <build>
     <finalName>${project.artifactId}</finalName>
-    <resources>
-      <resource>
-        <directory>src/main/resources/</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
     <plugins>
       <!-- BUILD AND FILES -->
       <plugin>
@@ -108,70 +145,183 @@
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
-          <outputEncoding>UTF-8</outputEncoding>
+          <outputEncoding>${project.build.sourceEncoding}</outputEncoding>
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>${maven-gpg-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
       </plugin>
       <!-- TEST AND COVERAGE -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.7</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <format>xml</format>
-          <instrumentation>
-            <excludes>
-              <exclude>**/*Configuration.class</exclude>
-              <exclude>**/*Application.class</exclude>
-            </excludes>
-          </instrumentation>
+          <argLine>-Duser.timezone=Europe/Berlin</argLine>
+          <systemPropertyVariables>
+            <jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>
+          </systemPropertyVariables>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <reportsDirectory>target/surefire-reports</reportsDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco.version}</version>
+        <executions>
+          <execution>
+            <id>default-instrument</id>
+            <goals>
+              <goal>instrument</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-restore-instrumented-classes</id>
+            <goals>
+              <goal>restore-instrumented-classes</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-report</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.eluder.coveralls</groupId>
         <artifactId>coveralls-maven-plugin</artifactId>
-        <version>4.3.0</version>
+        <version>${coveralls.version}</version>
       </plugin>
       <!-- DEPLOYMENT -->
       <plugin>
         <groupId>com.spotify</groupId>
-        <artifactId>docker-maven-plugin</artifactId>
-        <version>1.0.0</version>
+        <artifactId>dockerfile-maven-plugin</artifactId>
+        <version>${dockerfile-maven-plugin.version}</version>
         <configuration>
-          <serverId>dockerhub-jeggers</serverId>
-          <imageName>jeggers/${project.artifactId}</imageName>
-          <forceTags>true</forceTags>
-          <imageTags>
-            <imageTag>${project.version}</imageTag>
-            <imageTag>latest</imageTag>
-          </imageTags>
-          <baseImage>openjdk:8-jre-alpine</baseImage>
-          <volumes>
-            <volume>/var/log/apps</volume>
-          </volumes>
-          <env>
-            <!-- Do not change ENV-Key! JENKINS_URL is reserved! -->
-            <JENKINSURL></JENKINSURL>
-            <GITLAB_URL></GITLAB_URL>
-            <GITLAB_TOKEN></GITLAB_TOKEN>
-            <GITLAB_CHECKOUTURLSCHEME>SSH</GITLAB_CHECKOUTURLSCHEME>
-            <TASK_DELAY>60000</TASK_DELAY>
-            <HTTP_PORT>8080</HTTP_PORT>
-            <MAX_HEAP>100M</MAX_HEAP>
-            <JAVA_OPTS>-Dfoo=bar</JAVA_OPTS>
-          </env>
-          <cmd>["/bin/sh", "-c", "java -Djenkins.url=${JENKINSURL} -Dgitlab.url=${GITLAB_URL} -Dgitlab.token=${GITLAB_TOKEN} -Dgitlab.checkout.url.scheme=${GITLAB_CHECKOUTURLSCHEME} -Dtask.delay=${TASK_DELAY} -Dserver.port=${HTTP_PORT} -Dfile.encoding=UTF-8 -Xmx${MAX_HEAP} ${JAVA_OPTS} -jar /${project.build.finalName}.${project.packaging}"]</cmd>
-          <resources>
-            <resource>
-              <targetPath>/</targetPath>
-              <directory>${project.build.directory}</directory>
-              <include>${project.build.finalName}.${project.packaging}</include>
-            </resource>
-          </resources>
+          <repository>jeggers/${project.artifactId}</repository>
+          <tag>${project.version}</tag>
         </configuration>
+        <executions>
+          <execution>
+            <id>tag-latest</id>
+            <phase>none</phase>
+            <goals>
+              <goal>tag</goal>
+            </goals>
+            <configuration>
+              <tag>latest</tag>
+            </configuration>
+          </execution>
+          <execution>
+            <id>tag-version</id>
+            <phase>none</phase>
+            <goals>
+              <goal>tag</goal>
+            </goals>
+            <configuration>
+              <tag>${project.version}</tag>
+            </configuration>
+          </execution>
+          <execution>
+            <id>push-latest</id>
+            <phase>none</phase>
+            <goals>
+              <goal>push</goal>
+            </goals>
+            <configuration>
+              <tag>latest</tag>
+            </configuration>
+          </execution>
+          <execution>
+            <id>push-version</id>
+            <phase>none</phase>
+            <goals>
+              <goal>push</goal>
+            </goals>
+            <configuration>
+              <tag>${project.version}</tag>
+            </configuration>
+          </execution>
+        </executions>
+        <!-- Required to support Java 9 -->
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-archiver</artifactId>
+            <version>3.4</version>
+          </dependency>
+          <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>javax.activation-api</artifactId>
+            <version>1.2.0</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>de.jutzig</groupId>
+        <artifactId>github-release-plugin</artifactId>
+        <version>${github-release-plugin.version}</version>
       </plugin>
     </plugins>
   </build>

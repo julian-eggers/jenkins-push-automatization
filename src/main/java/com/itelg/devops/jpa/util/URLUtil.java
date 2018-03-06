@@ -2,6 +2,9 @@ package com.itelg.devops.jpa.util;
 
 import java.net.URL;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class URLUtil
 {
     public static String getHost(String url)
