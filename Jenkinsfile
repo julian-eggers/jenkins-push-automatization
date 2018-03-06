@@ -52,7 +52,7 @@ pipeline
         
         stage('Release')
         {
-            when { branch "springboot20" }
+            when { branch "master" }
         
             steps
             {

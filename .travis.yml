@@ -16,4 +16,3 @@ before_install:
 after_success:
   - mvn coveralls:report
   - java -cp ~/codacy-coverage-reporter-assembly-latest.jar com.codacy.CodacyCoverageReporter -l Java -r target/site/jacoco/jacoco.xml
-  
