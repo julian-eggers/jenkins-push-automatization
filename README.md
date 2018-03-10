@@ -15,7 +15,7 @@ docker run \
 -d \
 --name=jenkins-push-automatization \
 --restart=always \
-jeggers/jenkins-push-automatization:2.0.1-RELEASE \
+jeggers/jenkins-push-automatization:2.0.2-RELEASE \
 --gitlab.url=http://gitlab-server:8080/ \
 --gitlab.token=AfQ6P9DSfnu4tuzbe \
 --jenkins.url=http://jenkins-server:8080/
@@ -28,4 +28,6 @@ jeggers/jenkins-push-automatization:2.0.1-RELEASE \
 | --gitlab.token | yes |  | http://gitlab-server:8080/ |
 | --gitlab.checkout.url.scheme | no | SSH | SSH or HTTP |
 | --jenkins.url | yes |  | http://jenkins-server:8080/ |
+| --jenkins.username | no |  | admin |
+| --jenkins.password | no |  | secretPassword |
 | --task.delay | no | 60000 | 60000 (in milliseconds!) |
