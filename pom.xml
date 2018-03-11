@@ -5,7 +5,7 @@
   <name>jenkins-push-automatization</name>
   <description>Adds a jenkins webhook to every associated project.</description>
   <url>https://github.com/julian-eggers/jenkins-push-automatization</url>
-  <version>2.0.1-RELEASE</version>
+  <version>2.0.2-RELEASE</version>
 
   <properties>
     <!-- System -->
@@ -59,6 +59,11 @@
     <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.itelg.spring</groupId>
+      <artifactId>spring-jenkins-actuator</artifactId>
+      <version>1.0.1-RELEASE</version>
     </dependency>
 
     <!-- Other -->
