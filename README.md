@@ -15,7 +15,7 @@ docker run \
 -d \
 --name=jenkins-push-automatization \
 --restart=always \
-jeggers/jenkins-push-automatization:2.0.2-RELEASE \
+jeggers/jenkins-push-automatization:2.1.0-RELEASE \
 --gitlab.url=http://gitlab-server:8080/ \
 --gitlab.token=AfQ6P9DSfnu4tuzbe \
 --jenkins.url=http://jenkins-server:8080/
