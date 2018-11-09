@@ -31,3 +31,17 @@ jeggers/jenkins-push-automatization:2.1.0-RELEASE \
 | --jenkins.username | no |  | admin |
 | --jenkins.password | no |  | secretPassword |
 | --task.delay | no | 60000 | 60000 (in milliseconds!) |
+
+
+
+## Build & Release
+
+### Build
+```
+mvn clean package dockerfile:build
+```
+
+### Release
+```
+mvn clean package dockerfile:build dockerfile:tag@tag-latest dockerfile:tag@tag-version dockerfile:push@push-latest dockerfile:push@push-version github-release:release
+```
