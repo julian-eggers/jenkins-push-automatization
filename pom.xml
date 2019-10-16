@@ -19,7 +19,7 @@
     <easymock.version>4.0.1</easymock.version>
     <!-- Build -->
     <coveralls.version>4.3.0</coveralls.version>
-    <dockerfile-maven-plugin.version>1.4.8</dockerfile-maven-plugin.version>
+    <dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
     <github-release-plugin.version>1.3.0</github-release-plugin.version>
   </properties>
 
